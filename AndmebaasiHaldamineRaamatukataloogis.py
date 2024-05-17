@@ -1,5 +1,6 @@
-﻿﻿from tkinter import * 
+
 from sqlite3 import *
+from tkinter import * 
 from sqlite3 import connect, Error
 from tkinter import Tk, Button, Frame, CENTER, Entry, Label, messagebox
 from tkinter import ttk
@@ -206,16 +207,57 @@ def tabel_zzanrid(conn):
     tree.pack()
     window_zzanrid.mainloop()
 
-def drop_tables(conn):
+
+def delete_raamat_autor_id(conn, Autor_id):
     try:
         cursor = conn.cursor()
-        cursor.execute("DROP TABLE IF EXISTS raamatud")
-        cursor.execute("DROP TABLE IF EXISTS autorid")
-        cursor.execute("DROP TABLE IF EXISTS zanrid")
+        cursor.execute("DELETE FROM raamatud WHERE autor_id=?", (Autor_id,))
         conn.commit()
-        print("Все таблицы удалены успешно.")
+        messagebox.showinfo("Teade", "Autor id raamatud on kustutatud")
     except Error as e:
-        print(f"Ошибка при удалении таблиц: {e}") 
+        print(f"Tekkis viga : {e}")
+        messagebox.showerror("Viga", f"Tekkis viga: {e}")
+
+def delete_raamat_autor_id_aken():
+    window_delete = Tk()
+    window_delete.title("Raamatute kustutamine autori id järgi")
+    
+    Label(window_delete, text="Autor id :").grid(row=0, column=0, padx=10, pady=5)
+    autor_id_entry = Entry(window_delete)
+    autor_id_entry.grid(row=0, column=1, padx=10, pady=5)
+                     
+    def delete_raamat_autor_id_close():
+        try:
+            Autor_id = int(autor_id_entry.get())
+            delete_raamat_autor_id(conn, Autor_id)
+            window_delete.destroy()
+        except ValueError:
+            messagebox.showerror("Viga", "Palun sisestage kehtiv autor_id")
+
+    Button(window_delete, text="Kustuta", bg="#b399ff", command=delete_raamat_autor_id_close).grid(row=1, column=0, columnspan=2, pady=10)
+    window_delete.mainloop()
+
+delete_raamat_nupp = Button(aken,  text="Raamatute kustutamine autori id järgi",bg="#b0c4de",font=("Algerian", 20),command=delete_raamat_autor_id_aken)
+delete_raamat_nupp.grid(row=1, column=3, columnspan=4) 
+delete_raamat_nupp.pack()
+
+def drop_tables(conn, table_name):
+    try:
+        cursor = conn.cursor()
+        cursor.execute(f"DROP TABLE {table_name}")
+        conn.commit()
+        messagebox.showinfo("Viga", f"Tabel {table_name} on kustutatud!")
+    except Exception as e:
+        messagebox.showerror("Viga", f"Tekkis viga: {e}")
+
+
+drop_table_button = Menubutton(aken, text="Tabeli kutsutamine",font="Algerian 25",bg="#87cefa", relief="raised")
+drop_table_button.pack()
+submenu_delete_table = Menu(drop_table_button, font="Algerian 15", tearoff=0)
+drop_table_button.configure(menu=submenu_delete_table)
+tables_delete = ["autorid", "zanrid", "raamatud"]
+for table_name in tables_delete:
+    submenu_delete_table.add_command(label=table_name, command=lambda tn=table_name: drop_tables(conn, tn))
 
 f = Frame(aken)
 raamatu_nupp = Button(f, text="Raamatud", font=("Algerian", 20), bg="#99ccff", command=lambda: tabel_rramatuid(conn))
@@ -225,24 +267,8 @@ autori_nupp = Button(f, text="Autorid", font=("Algerian", 20), bg="#99b3ff", com
 autori_nupp.grid(row=5, column=3, columnspan=4)
 
 zanri_nupp = Button(f, text="Zanrid", font=("Algerian", 20), bg="#9999ff", command=lambda: tabel_zzanrid(conn))
-zanri_nupp.grid(row=7, column=3, columnspan=4)
+zanri_nupp.grid(row=7, column=3, columnspan=4) 
 
-def dropTable(table_name, conn):
-    try:
-        cursor = conn.cursor()
-        cursor.execute(f"DROP TABLE {table_name}")
-        conn.commit()
-        messagebox.showinfo(f"Tabel {table_name} on kustutatud!")
-    except Exception as e:
-        messagebox.showerror(f"Tekkis väga: {e}")
-
-delete_table_button = Menubutton(aken, text="Tabeli kutsutamine",font="Algerian 25", relief="raised")
-delete_table_button.pack()
-submenu_delete_table = Menu(delete_table_button, font=("Algerian", 15), tearoff=0)
-delete_table_button.configure(menu=submenu_delete_table)
-tables_delete = ["autorid", "zanrid", "raamatud"]
-for table_name in tables_delete:
-    submenu_delete_table.add_command(label=table_name, command=lambda tn=table_name: dropTable(conn, tn))
 
 
 f.pack()
