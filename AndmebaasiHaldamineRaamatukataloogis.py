@@ -71,11 +71,11 @@ def tabel_rramatuid(conn):
 
     window_raamatud = Tk()
     window_raamatud.title("Raamatud")
-    tree = ttk.Treeview(window_raamatud, column=("Raamat_id", "pealkiri", "valjaandmise_kuupäev", "autor_id", "zanr_id"), show="headings")
+    tree = ttk.Treeview(window_raamatud, column=("Raamat_id", "pealkiri", "valjaandmise_kuupäev", "autor_nimi", "zanr_id"), show="headings")
     tree.heading('Raamat_id', text='Raamat_id', anchor=CENTER)
     tree.heading('pealkiri', text='Pealkiri', anchor=CENTER)
     tree.heading('valjaandmise_kuupäev', text='Valjaandmise kuupäev', anchor=CENTER)
-    tree.heading('autor_id', text='Autor_id', anchor=CENTER)
+    tree.heading('autor_nimi', text='Autori nimi', anchor=CENTER)
     tree.heading('zanr_id', text='Zanr_id', anchor=CENTER)
 
     create_Raamatud_table = """
@@ -103,9 +103,12 @@ def tabel_rramatuid(conn):
     execute_query(conn, insert_raamatud)
 
     try:
-        read = execute_read_query(conn, "SELECT * FROM raamatud")
-        for row in read:
-            tree.insert("", "end", values=row)
+        read = execute_read_query(conn, "SELECT raamatud.Raamat_id, raamatud.pealkiri, raamatud.valjaandmise_kuupäev, autorid.autor_nimi, raamatud.zanr_id FROM raamatud INNER JOIN autorid ON raamatud.autor_id = autorid.Autor_id")
+        if read is not None:
+            for row in read:
+                tree.insert("", "end", values=row)
+        else:
+            print("No data retrieved from the query.")
     except Error as e:
         print(f"Tekkis viga : {e}")
 
@@ -251,7 +254,7 @@ def drop_tables(conn, table_name):
         messagebox.showerror("Viga", f"Tekkis viga: {e}")
 
 
-drop_table_button = Menubutton(aken, text="Tabeli kutsutamine",font="Algerian 25",bg="#87cefa", relief="raised")
+drop_table_button = Menubutton(aken, text="Tabeli kustutamine",font="Algerian 25",bg="#87cefa", relief="raised")
 drop_table_button.pack()
 submenu_delete_table = Menu(drop_table_button, font="Algerian 15", tearoff=0)
 drop_table_button.configure(menu=submenu_delete_table)
