@@ -204,7 +204,7 @@ def tabel_zzanrid(conn):
     tree.pack()
     window_zzanrid.mainloop()
 
-def delete_raamat_autor_id(conn, autor_nimi):
+def delete_raamat_autor_nimi(conn, autor_nimi):
     try:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM raamatud WHERE autor_nimi=?", (autor_nimi,))
@@ -222,15 +222,15 @@ def delete_raamat_autor_id_aken(conn):
     autor_nimi_entry = Entry(window_delete)
     autor_nimi_entry.grid(row=0, column=1, padx=10, pady=5)
                      
-    def delete_raamat_autor_id_close():
+    def delete_raamat_autor_nimi_close():
         autor_nimi = autor_nimi_entry.get()
         if autor_nimi:
-            delete_raamat_autor_id(conn, autor_nimi)
+            delete_raamat_autor_nimi(conn, autor_nimi)
             window_delete.destroy()
         else:
             messagebox.showerror("Viga", "Palun sisestage kehtiv autori nimi")
 
-    Button(window_delete, text="Kustuta", bg="#b399ff", command=delete_raamat_autor_id_close).grid(row=1, column=0, columnspan=2, pady=10)
+    Button(window_delete, text="Kustuta", bg="#b399ff", command=delete_raamat_autor_nimi_close).grid(row=1, column=0, columnspan=2, pady=10)
     window_delete.mainloop()
 
     
